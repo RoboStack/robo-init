@@ -8,7 +8,7 @@ console = Console()
 
 class RaspberryPiConfig:
 
-	folder = Path("/boot/config")
+	folder = Path("/boot/firmware")
 	verbose = True
 
 	def _parse_file(self, file, config_dict):
@@ -37,22 +37,22 @@ class RaspberryPiConfig:
 						console.print(f"[yellow]Reading [/yellow]{self.folder / r}")
 						with open(self.folder / r, 'r') as fi:
 							rval = fi.read()
-						config_dict[l] = rval
+						config_dict.append((l, rval))
 					else:
-						config_dict[l] = r
+						config_dict.append((l, r))
 
 					if self.verbose:
-						console.print(f"[green]{l}=[bold]{config_dict[l]}")
+						console.print(f"[green]{config_dict[-1][0]}=[bold]{config_dict[-1][1]}")
 
 
 
 	def list_existing(self):
 		entry_point = self.folder / "config.txt"
 
-		config_options = OrderedDict()
+		config_options = []
 		self._parse_file('config.txt', config_options)
 
-		for k, v in config_options.items():
+		for k, v in config_options:
 			print(f"{k}={v}")
 
 if __name__ == "__main__":
