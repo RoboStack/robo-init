@@ -72,6 +72,8 @@ def udev_to_file(cfg):
 		x = UDEV(e["rules"])
 		x.to_cloud_init(cfg, e.get("name", "robo_init"))
 
+	del cfg["udev"]
+
 	return cfg
 
 if __name__ == "__main__":

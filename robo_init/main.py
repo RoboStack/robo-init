@@ -1,8 +1,10 @@
 import yaml
 import argparse
 from rich import console
-from .udev import udev_to_file
+from rich.syntax import Syntax
 
+from .udev import udev_to_file
+from .raspberry_pi import raspberry_pi_to_file
 
 console = console.Console()
 
@@ -26,8 +28,14 @@ def main():
 		print(cfg['udev'])
 		udev_to_file(cfg)
 
-	print(yaml.dump(cfg))
+	if "raspberry_pi" in cfg:
+		print(cfg['raspberry_pi'])
+		raspberry_pi_to_file(cfg)
 
+	console.print(Syntax(yaml.dump(cfg), 'yaml'))
+
+	with open("cloud_init_generated.yaml", "w") as fo:
+		fo.write(yaml.dump(cfg))
 
 if __name__ == "__main__":
 	main()
