@@ -20,12 +20,11 @@ class RaspberryPiConfig:
 				x = l.strip()
 				if len(x) == 0:
 					continue
-				if x[0] == '#':
+				elif x[0] == '#':
 					console.print(f"[grey]{x}")
-				if x.startswith('include '):
+				elif x.startswith('include '):
 					self._parse_file(x.split(' ')[1], config_dict)
-
-				if '=' in x:
+				elif '=' in x:
 					l, r = x.split('=', 1)
 
 					if '#' in r:
