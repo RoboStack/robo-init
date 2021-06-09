@@ -1,0 +1,69 @@
+groups:
+  - ubuntu: [root,sys]
+  - niryo: [root,sys]
+
+users:
+  - default
+  - name: niryo
+    gecos: Niryo User
+    primary_group: niryo
+    groups: users, admin, dialout, sudo
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    plain_text_passwd: 'robotics'
+    lock_passwd: false
+    # ssh_authorized_keys:
+    #   - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEA3FSyQwBI6Z+nCSjUUk8EEAnnkhXlukKoUPND/RRClWz2s5TCzIkd3Ou5+Cyz71X0XmazM3l5WgeErvtIwQMyT1KjNoMhoJMrJnWqQPOt5Q8zWd9qG7PBl9+eiH5qV7NZ mykey@host
+
+    # passwd: $6$j212wezy$7H/1LT4f9/N3wpgNunhsIqtMj62OKiS3nyNwuizouQc3u7MbYCarYeAHWYPYb2FT.lbioDm2RrkJPb9BZMN1O/
+    # selinux_user: staff_u
+    # expiredate: '2032-09-01'
+    # ssh_import_id: foobar
+    # lock_passwd: false
+
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+      optional: true
+  wifis:
+    wlan0:
+      dhcp4: true
+      optional: true
+      access-points:
+        "Your-WiFi-Network-Name":
+          password: "******"
+
+udev:
+  - name: robot-rules
+    rules:
+    - ACTION=="add", KERNEL=="i2c-[0-1]*", MODE="0666"
+    - ACTION=="add", KERNEL=="gpio", MODE="0666"
+    # - ACTION=="add", KERNEL=="spi", MODE="0666"
+    - ACTION=="add", KERNEL=="spidev0.0", MODE="0666"
+    - ACTION=="add", KERNEL=="dialout", MODE="0666"
+    - ACTION=="add", KERNEL=="ttyACM0", MODE="0666"
+    - ACTION=="add", KERNEL=="ttyAMA0", MODE="0666"
+    - ACTION=="add", KERNEL=="gpiomem", MODE="0666"
+    - ACTION=="add", KERNEL=="mem", MODE="0666"
+    - ACTION=="add", KERNEL=="ttyS0", MODE="0666"
+
+raspberry_pi:
+  # For niryo
+  # This should write out to /boot/firmware/usercfg.txt on Ubuntu 18.04+
+  # And append to /boot/firmware/config.txt on Raspbian ?
+  config:
+    - init_uart_clock=16000000
+    - enable_uart=1
+    - dtoverlay=disable-bt
+    - dtparam=spi=on
+    - dtparam=i2c1=on
+    - dtparam=i2c_arm=on
+    - dtparam=uart0=on
+    - dtoverlay=mcp2515-can0-overlay,oscillator=16000000,interrupt=25  # Place "config.txt" changes (dtparam, dtoverlay, disable_overscan, etc.) in
+  # [    0.000000] Kernel command line: coherent_pool=1M 8250.nr_uarts=1 snd_bcm2835.enable_compat_alsa=0 snd_bcm2835.enable_hdmi=1 bcm2708_fb.fbwidth=656 bcm2708_fb.fbheight=416 bcm2708_fb.fbswap=1 vc_mem.mem_base=0x3ec00000 vc_mem.mem_size=0x40000000  dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles
+    - cmdline=dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles
+swap:
+  filename: /swap.img
+  size: "auto" # or size in bytes
+  maxsize: 1000000000 # 1Gb
