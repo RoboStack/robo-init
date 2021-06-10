@@ -1,23 +1,46 @@
-groups:
-  - ubuntu: [root,sys]
-  - niryo: [root,sys]
+# This is the user-data configuration file for cloud-init. By default this sets
+# up an initial user called "ubuntu" with password "ubuntu", which must be
+# changed at first login. However, many additional actions can be initiated on
+# first boot from this file. The cloud-init documentation has more details:
+#
+# https://cloudinit.readthedocs.io/
+#
+# Some additional examples are provided in comments below the default
+# configuration.
+
+# definitely change this line! :)
+ssh_import_id:
+  - gh:my-github-username
+
+# Enable password authentication with the SSH daemon
+ssh_pwauth: true
+
+# chpasswd:
+#   expire: true
+#   list:
+#   - niryo:robotics
+
+# groups:
+#   - niryo: [root,sys]
 
 users:
-  - default
+  # - default
   - name: niryo
     gecos: Niryo User
     primary_group: niryo
-    groups: users, admin, dialout, sudo
+    groups: [adm, audio, cdrom, dialout, floppy, video, plugdev, dip, netdev]
     sudo: ALL=(ALL) NOPASSWD:ALL
-    plain_text_passwd: 'robotics'
+    # if lock_passwd == False, allows login with password
     lock_passwd: false
-    # ssh_authorized_keys:
-    #   - ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEA3FSyQwBI6Z+nCSjUUk8EEAnnkhXlukKoUPND/RRClWz2s5TCzIkd3Ou5+Cyz71X0XmazM3l5WgeErvtIwQMyT1KjNoMhoJMrJnWqQPOt5Q8zWd9qG7PBl9+eiH5qV7NZ mykey@host
-
+    plain_text_passwd: 'robotics'
     # passwd: $6$j212wezy$7H/1LT4f9/N3wpgNunhsIqtMj62OKiS3nyNwuizouQc3u7MbYCarYeAHWYPYb2FT.lbioDm2RrkJPb9BZMN1O/
+    shell: /bin/bash
+    home: /home/niryo
+    ssh_import_id: gh:my-github-username
+    # ssh_authorized_keys:
+    #   - ssh-rsa AAAAB3NzaC1yc2E... test@user
     # selinux_user: staff_u
     # expiredate: '2032-09-01'
-    # ssh_import_id: foobar
     # lock_passwd: false
 
 network:
@@ -31,8 +54,10 @@ network:
       dhcp4: true
       optional: true
       access-points:
-        "Your-WiFi-Network-Name":
-          password: "******"
+        "my-acc-pt":
+          password: "*******"
+
+hostname: niryorobot
 
 udev:
   - name: robot-rules
@@ -61,10 +86,20 @@ raspberry_pi:
     - dtparam=i2c_arm=on
     - dtparam=uart0=on
     - dtoverlay=mcp2515-can0-overlay,oscillator=16000000,interrupt=25  # Place "config.txt" changes (dtparam, dtoverlay, disable_overscan, etc.) in
-  # [    0.000000] Kernel command line: coherent_pool=1M 8250.nr_uarts=1 snd_bcm2835.enable_compat_alsa=0 snd_bcm2835.enable_hdmi=1 bcm2708_fb.fbwidth=656 bcm2708_fb.fbheight=416 bcm2708_fb.fbswap=1 vc_mem.mem_base=0x3ec00000 vc_mem.mem_size=0x40000000  dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles
     - cmdline=dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles
 
 swap:
   filename: /swap.img
   size: "auto" # or size in bytes
   maxsize: 1000000000 # 1Gb
+
+runcmd:
+- [ sh, -xc, "echo 'Welcome to Niryo Robot!'" ]
+
+# Reboot so that udev changes take effect
+power_state:
+  delay: "+1"
+  mode: reboot
+  message: Initialization done, rebooting! 
+  timeout: 60
+  condition: True

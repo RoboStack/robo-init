@@ -12,7 +12,7 @@ class UDEV():
 	"""
 
 	folders = [Path(p) for p in [
-		"/etc/udev/udev.conf",
+		"/etc/udev/rules.d",
 		"/lib/udev/rules.d",
 		"/run/udev/rules.d"
 	]]
