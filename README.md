@@ -32,3 +32,31 @@ set up initially and more. All of this is derived from the initial "niryo.yml" f
 
 If you're running a Ubuntu RaspberryPi image, you can just drop these files in the 
 boot partition and replace the ones that are there by default.
+
+### Configuring the robot as a hotspot
+
+> *NOTE*: we're still investigating how to do this optimally, the current answer is based on [link](https://raspberrypi.stackexchange.com/a/109427).
+
+To configure the robot as a hotspot / access point you can generate the appropriate netplan configuration through cloud-init. Because the "NetworkManager" renderer is required, the `network-manager` package has to be installed first though.
+
+`sudo apt install network-manager`
+
+```yaml
+# you could maybe also write this file directly to `/etc/netplan/10-hotspot.yaml`
+# since cloud-init writes to `50-cloud-init.yaml`, thus overriding the cloud-init config.
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    eth0:
+      dhcp4: true
+      optional: true
+  wifis:
+    wlan0:
+      dhcp4: true
+      optional: true
+      access-points:
+        "Raspberry":
+          password: "your password here"
+          mode: ap
+```
