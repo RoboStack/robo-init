@@ -1,6 +1,6 @@
 # robo-init
 
-robo-init is an extension to `cloud-init` from Canonical and adds some robot/hardware-specific functionality. If you have a robot which needs "hardware"-configuration, you can use `robo-init` to consistently set up things like:
+robo-init is an extension to [`cloud-init`](https://cloudinit.readthedocs.io/en/latest/) from Canonical and adds some robot/hardware-specific functionality. If you have a robot which needs "hardware"-configuration, you can use `robo-init` to consistently set up things like:
 
 - wifi and other network connections
 - install packages
